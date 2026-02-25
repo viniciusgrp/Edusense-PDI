@@ -1115,7 +1115,6 @@ function openNovoPDISupervisorModal() {
   document.getElementById('novo-pdi-supervisor-objetivo').value = '';
   document.getElementById('novo-pdi-supervisor-tipo').value = '';
   document.getElementById('novo-pdi-supervisor-valores-lista').innerHTML = '';
-  adicionarValorComportamentoSupervisor();
   document.getElementById('modal-novo-pdi-supervisor').classList.remove('hidden');
   document.getElementById('modal-novo-pdi-supervisor').classList.add('flex');
 }
@@ -1340,7 +1339,7 @@ document.getElementById('btn-novo-pdi-sup-enviar')?.addEventListener('click', en
 let currentAdminValorNome = null;
 let currentAdminComportamentoIdx = null;
 
-function renderizarAdminValores() {
+function renderizarAdminValores(valorManterExpandido) {
   const container = document.getElementById('admin-valores-lista');
   if (!container) return;
   container.innerHTML = '';
@@ -1404,13 +1403,22 @@ function renderizarAdminValores() {
       listaComp.appendChild(compDiv);
     });
   });
+
+  if (valorManterExpandido && VALORES_DATA[valorManterExpandido]) {
+    const valorId = 'valor-' + valorManterExpandido.replace(/\s+/g, '-').toLowerCase();
+    const el = document.getElementById(valorId);
+    const btn = el?.previousElementSibling;
+    const chevron = btn?.querySelector('.valor-chevron');
+    if (el) el.classList.remove('hidden');
+    if (chevron) chevron.style.transform = 'rotate(180deg)';
+  }
 }
 
 function removerComportamentoAdmin(valorNome, idx) {
   if (!VALORES_DATA[valorNome]) return;
   VALORES_DATA[valorNome].splice(idx, 1);
   salvarValoresNoStorage();
-  renderizarAdminValores();
+  renderizarAdminValores(valorNome);
 }
 
 function removerAcaoAdmin(valorNome, compIdx, acaoIdx) {
@@ -1418,7 +1426,7 @@ function removerAcaoAdmin(valorNome, compIdx, acaoIdx) {
   if (!comp || typeof comp === 'string') return;
   comp.acoes?.splice(acaoIdx, 1);
   salvarValoresNoStorage();
-  renderizarAdminValores();
+  renderizarAdminValores(valorNome);
 }
 
 function toggleValorConfig(id) {
@@ -1475,7 +1483,7 @@ function saveNovoComportamento() {
   if (!VALORES_DATA[currentAdminValorNome]) VALORES_DATA[currentAdminValorNome] = [];
   VALORES_DATA[currentAdminValorNome].push({ nome, acoes: [] });
   salvarValoresNoStorage();
-  renderizarAdminValores();
+  renderizarAdminValores(currentAdminValorNome);
   closeNovoComportamentoModal();
 }
 
@@ -1507,7 +1515,7 @@ function saveNovaAcaoAdmin() {
   if (!comp.acoes) comp.acoes = [];
   comp.acoes.push(titulo);
   salvarValoresNoStorage();
-  renderizarAdminValores();
+  renderizarAdminValores(currentAdminValorNome);
   closeNovaAcaoAdminModal();
 }
 
