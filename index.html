@@ -448,6 +448,12 @@
           <div id="acao-outro-container" class="mt-2 hidden">
             <textarea id="acao-outro" rows="3" placeholder="Descreva sua ação personalizada..." class="w-full bg-dark-bg border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary"></textarea>
           </div>
+          <div id="acao-trilha-container" class="mt-2 hidden">
+            <label class="block text-primary text-sm font-medium mb-1">Vincular a trilha</label>
+            <select id="acao-trilha" class="w-full bg-dark-bg border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary">
+              <option value="">Selecione uma trilha...</option>
+            </select>
+          </div>
         </div>
         
         <div class="grid grid-cols-2 gap-4">
@@ -619,11 +625,11 @@
     </div>
   </div>
 
-  <!-- Modal: Novo Comportamento (Admin) -->
+  <!-- Modal: Novo/Editar Comportamento (Admin) -->
   <div id="modal-novo-comportamento" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop p-4">
     <div class="bg-dark-card rounded-xl max-w-md w-full border border-gray-700 shadow-2xl" onclick="event.stopPropagation()">
       <div class="p-6 border-b border-gray-700 flex items-center justify-between">
-        <h3 class="text-lg font-semibold">Novo Comportamento</h3>
+        <h3 id="modal-novo-comportamento-titulo" class="text-lg font-semibold">Novo Comportamento</h3>
         <button onclick="closeNovoComportamentoModal()" class="p-2 hover:bg-gray-700 rounded-lg transition">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
@@ -636,16 +642,16 @@
       </div>
       <div class="p-6 border-t border-gray-700 flex justify-end gap-2">
         <button onclick="closeNovoComportamentoModal()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm">Cancelar</button>
-        <button onclick="saveNovoComportamento()" class="px-4 py-2 bg-primary hover:bg-primary/90 rounded-lg text-white text-sm">Adicionar</button>
+        <button id="modal-novo-comportamento-btn" onclick="saveNovoComportamento()" class="px-4 py-2 bg-primary hover:bg-primary/90 rounded-lg text-white text-sm">Adicionar</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal: Nova Ação (Admin - dentro do Comportamento) -->
+  <!-- Modal: Nova/Editar Ação (Admin - dentro do Comportamento) -->
   <div id="modal-nova-acao-admin" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop p-4">
     <div class="bg-dark-card rounded-xl max-w-md w-full border border-gray-700 shadow-2xl" onclick="event.stopPropagation()">
       <div class="p-6 border-b border-gray-700 flex items-center justify-between">
-        <h3 class="text-lg font-semibold">Nova Ação</h3>
+        <h3 id="modal-nova-acao-admin-titulo-h3" class="text-lg font-semibold">Nova Ação</h3>
         <button onclick="closeNovaAcaoAdminModal()" class="p-2 hover:bg-gray-700 rounded-lg transition">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
@@ -655,10 +661,14 @@
           <label class="block text-primary text-sm font-medium mb-2">Descrição da ação</label>
           <input type="text" id="nova-acao-admin-titulo" placeholder="Ex: Conduzir reuniões semanais com a equipe" class="w-full bg-dark-bg border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary">
         </div>
+        <div class="flex items-center gap-2">
+          <input type="checkbox" id="nova-acao-admin-vincula-trilha" class="w-4 h-4 rounded border-gray-600 bg-dark-bg text-primary focus:ring-primary">
+          <label for="nova-acao-admin-vincula-trilha" class="text-sm text-gray-300">Vincular a trilha dinâmica</label>
+        </div>
       </div>
       <div class="p-6 border-t border-gray-700 flex justify-end gap-2">
         <button onclick="closeNovaAcaoAdminModal()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm">Cancelar</button>
-        <button onclick="saveNovaAcaoAdmin()" class="px-4 py-2 bg-primary hover:bg-primary/90 rounded-lg text-white text-sm">Adicionar</button>
+        <button id="modal-nova-acao-admin-btn" onclick="saveNovaAcaoAdmin()" class="px-4 py-2 bg-primary hover:bg-primary/90 rounded-lg text-white text-sm">Adicionar</button>
       </div>
     </div>
   </div>

@@ -9,6 +9,7 @@ let actionModalContext = null;
 let currentAcaoBlocoId = null;
 let currentAcaoValor = '';
 let currentAcaoComportamento = '';
+let currentAcaoOpts = [];
 let currentDetalhesPdiId = null;
 let currentDetalhesIsSupervisorView = false;
 
@@ -141,12 +142,26 @@ function getComportamentosList(valor) {
   if (!arr) return [];
   return arr.map(c => typeof c === 'string' ? c : c.nome);
 }
-// Helper: retorna ações de um comportamento
+// Helper: retorna ações de um comportamento (cada item: { texto, vinculaTrilha } ou string)
 function getAcoesDoComportamento(valor, comportamento) {
   const arr = VALORES_DATA[valor];
   if (!arr) return [];
   const comp = arr.find(c => (typeof c === 'string' ? c : c.nome) === comportamento);
-  return comp?.acoes || [];
+  const acoes = comp?.acoes || [];
+  return acoes.map(a => typeof a === 'string' ? { texto: a, vinculaTrilha: false } : { texto: a.texto || a, vinculaTrilha: !!a.vinculaTrilha });
+}
+
+const TRILHAS_DEFAULT = ['Trilha de Liderança', 'Trilha de Comunicação', 'Trilha de Gestão de Projetos', 'Trilha Técnica', 'Trilha de Desenvolvimento'];
+const STORAGE_KEY_TRILHAS = 'pdi_trilhas';
+function getTrilhas() {
+  try {
+    const s = localStorage.getItem(STORAGE_KEY_TRILHAS);
+    if (s) {
+      const parsed = JSON.parse(s);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch (_) {}
+  return [...TRILHAS_DEFAULT];
 }
 const ACOES_SUGERIDAS = {
   '70': ['Liderar um projeto multidisciplinar', 'Conduzir reuniões semanais com a equipe', 'Assumir responsabilidade por uma entrega crítica'],
@@ -381,11 +396,20 @@ function updateAcaoTipoOptions(metodologia, valor, comportamento) {
     opts = getAcoesDoComportamento(valor, comportamento);
   }
   if (opts.length === 0) {
-    opts = ACOES_SUGERIDAS[metodologia] || ACOES_SUGERIDAS['70'];
+    const sugeridas = ACOES_SUGERIDAS[metodologia] || ACOES_SUGERIDAS['70'];
+    opts = sugeridas.map(t => ({ texto: t, vinculaTrilha: false }));
   }
+  currentAcaoOpts = opts;
   tipo.innerHTML = '<option value="">Selecione uma ação sugerida...</option>' +
-    opts.map((t, i) => `<option value="${i}">${t}</option>`).join('') +
+    opts.map((t, i) => {
+      const txt = typeof t === 'string' ? t : (t.texto || '');
+      return `<option value="${i}">${(txt || '').replace(/</g, '&lt;')}</option>`;
+    }).join('') +
     '<option value="outro">Outro (ação personalizada)</option>';
+  document.getElementById('acao-trilha-container').classList.add('hidden');
+  const trilhaSelect = document.getElementById('acao-trilha');
+  trilhaSelect.innerHTML = '<option value="">Selecione uma trilha...</option>' +
+    getTrilhas().map(tr => `<option value="${tr}">${tr}</option>`).join('');
 }
 
 function closeActionModal() {
@@ -401,18 +425,24 @@ function saveAction() {
   const metodologia = document.getElementById('acao-metodologia');
   const tipo = document.getElementById('acao-tipo');
   const outro = document.getElementById('acao-outro');
+  const trilhaSelect = document.getElementById('acao-trilha');
   const dataInicio = document.getElementById('acao-data-inicio').value;
   const dataFim = document.getElementById('acao-data-fim').value;
   const status = document.getElementById('acao-status').value;
   let acaoTexto = tipo.value === 'outro' ? (outro?.value?.trim() || '') : (tipo.options[tipo.selectedIndex]?.text || '');
   if (!acaoTexto || acaoTexto === 'Outro (ação personalizada)') { closeActionModal(); return; }
+  const idx = parseInt(tipo.value, 10);
+  const acaoOpt = !isNaN(idx) && currentAcaoOpts[idx] ? currentAcaoOpts[idx] : null;
+  const trilha = acaoOpt?.vinculaTrilha && trilhaSelect?.value ? trilhaSelect.value : '';
   const metodologiaLabels = { '70': '70 – Experiência Prática', '20': '20 – Aprendizado Social', '10': '10 – Aprendizado Formal' };
   const statusLabels = { nao_iniciado: 'Não Iniciado', em_andamento: 'Em Andamento', concluido: 'Concluído' };
+  const trilhaLinha = trilha ? `<p class="text-xs text-primary">Trilha: ${trilha.replace(/</g, '&lt;')}</p>` : '';
   const acaoHtml = (excluirOnclick) => `
-    <div class="flex items-center justify-between p-3 bg-dark-bg rounded-lg border border-gray-700 bloco-acao-item">
+    <div class="flex items-center justify-between p-3 bg-dark-bg rounded-lg border border-gray-700 bloco-acao-item" data-trilha="${(trilha || '').replace(/"/g, '&quot;')}">
       <div>
         <p class="text-sm font-medium">${acaoTexto.replace(/</g, '&lt;')}</p>
         <p class="text-xs text-gray-400">${metodologiaLabels[metodologia.value]} • ${dataInicio || '—'} a ${dataFim || '—'}</p>
+        ${trilhaLinha}
       </div>
       <div class="flex items-center gap-2">
         <span class="text-xs px-2 py-0.5 rounded bg-gray-700">${statusLabels[status]}</span>
@@ -443,7 +473,12 @@ function saveAction() {
 
 document.getElementById('acao-metodologia')?.addEventListener('change', (e) => updateAcaoTipoOptions(e.target.value, currentAcaoValor, currentAcaoComportamento));
 document.getElementById('acao-tipo')?.addEventListener('change', (e) => {
-  document.getElementById('acao-outro-container').classList.toggle('hidden', e.target.value !== 'outro');
+  const val = e.target.value;
+  document.getElementById('acao-outro-container').classList.toggle('hidden', val !== 'outro');
+  const idx = parseInt(val, 10);
+  const mostraTrilha = val !== '' && val !== 'outro' && !isNaN(idx) && currentAcaoOpts[idx]?.vinculaTrilha;
+  document.getElementById('acao-trilha-container').classList.toggle('hidden', !mostraTrilha);
+  if (!mostraTrilha) document.getElementById('acao-trilha').value = '';
 });
 document.getElementById('modal-acao')?.addEventListener('click', (e) => {
   if (e.target === e.currentTarget) closeActionModal();
@@ -545,11 +580,13 @@ function openDetalhesPDIModal(status, pdiId, opts) {
           <option value="concluido" ${a.status === 'concluido' ? 'selected' : ''}>Concluído</option>
         </select>
       ` : `<span class="text-xs px-2 py-0.5 rounded bg-gray-700">${statusTxt}</span>`;
+      const trilhaLinha = a.trilha ? `<p class="text-xs text-primary">Trilha: ${(a.trilha || '').replace(/</g, '&lt;')}</p>` : '';
       return `
       <div class="flex items-center justify-between gap-4 flex-wrap p-3 bg-dark-bg rounded-lg border border-gray-700" data-action-index="${i}">
         <div>
           <p class="text-sm font-medium">${(a.texto || '').replace(/</g, '&lt;')}</p>
           <p class="text-xs text-gray-400">${a.metodologia || ''} • ${a.dataInicio || '—'} a ${a.dataFim || '—'}</p>
+          ${trilhaLinha}
         </div>
         ${statusSelect}
       </div>
@@ -605,18 +642,22 @@ function renderizarBlocosDetalhesPDI(blocos) {
     const compOpts = comportamentos.map(c => `<option ${c === bloco.comportamento ? 'selected' : ''}>${c}</option>`).join('');
     const acoes = bloco.acoes || [];
     const statusLabels = { nao_iniciado: 'Não Iniciado', em_andamento: 'Em Andamento', concluido: 'Concluído' };
-    const acoesHtml = acoes.map((a, ai) => `
-      <div class="flex items-center justify-between p-3 bg-dark-bg rounded-lg border border-gray-700 bloco-acao-item">
+    const acoesHtml = acoes.map((a, ai) => {
+      const trilhaLinha = a.trilha ? `<p class="text-xs text-primary">Trilha: ${(a.trilha || '').replace(/</g, '&lt;')}</p>` : '';
+      return `
+      <div class="flex items-center justify-between p-3 bg-dark-bg rounded-lg border border-gray-700 bloco-acao-item" data-trilha="${(a.trilha || '').replace(/"/g, '&quot;')}">
         <div>
           <p class="text-sm font-medium">${(a.texto || '').replace(/</g, '&lt;')}</p>
           <p class="text-xs text-gray-400">${a.metodologia || ''} • ${a.dataInicio || '—'} a ${a.dataFim || '—'}</p>
+          ${trilhaLinha}
         </div>
         <div class="flex items-center gap-2">
           <span class="text-xs px-2 py-0.5 rounded bg-gray-700">${statusLabels[a.status] || 'Não Iniciado'}</span>
           <button onclick="this.closest('.bloco-acao-item').remove()" class="text-red-400 hover:text-red-300 text-sm">Excluir</button>
         </div>
       </div>
-    `).join('');
+    `;
+    }).join('');
     return `
       <div id="${id}" class="p-4 bg-dark-bg/50 rounded-lg border border-gray-700 bloco-detalhes-pdi" data-bloco-index="${bi}">
         <div class="grid grid-cols-2 gap-4 mb-3">
@@ -678,7 +719,7 @@ function obterBlocosDoModalDetalhes() {
     const acoes = [];
     acoesDivs.forEach(ac => {
       const textoEl = ac.querySelector('p.text-sm.font-medium');
-      const metaEl = ac.querySelector('p.text-xs');
+      const metaEl = ac.querySelector('p.text-xs.text-gray-400');
       const statusSpan = ac.querySelector('span.rounded');
       const meta = metaEl?.textContent || '';
       const parts = meta.split('•').map(s => s.trim());
@@ -687,7 +728,8 @@ function obterBlocosDoModalDetalhes() {
       const [dataInicio, dataFim] = (datasPart || '').split(' a ').map(s => s?.trim() || '—');
       const statusTxt = (statusSpan?.textContent || '').toLowerCase();
       const status = statusTxt.includes('andamento') ? 'em_andamento' : statusTxt.includes('conclu') ? 'concluido' : 'nao_iniciado';
-      acoes.push({ texto: textoEl?.textContent?.trim() || '', metodologia, dataInicio: dataInicio || '—', dataFim: dataFim || '—', status });
+      const trilha = ac.dataset?.trilha || '';
+      acoes.push({ texto: textoEl?.textContent?.trim() || '', metodologia, dataInicio: dataInicio || '—', dataFim: dataFim || '—', status, trilha });
     });
     blocos.push({
       valor: valorSel?.value || '',
@@ -922,8 +964,8 @@ function obterDadosFormNovoPDI() {
   const comportamento = comportamentoSelect?.options[comportamentoSelect?.selectedIndex]?.text || '';
   const acoes = [];
   (listaValores?.querySelectorAll('.bloco-acoes-lista > div') || []).forEach(div => {
-    const textoEl = div.querySelector('p.text-sm');
-    const metaEl = div.querySelector('p.text-xs');
+    const textoEl = div.querySelector('p.text-sm.font-medium') || div.querySelector('p.text-sm');
+    const metaEl = div.querySelector('p.text-xs.text-gray-400') || div.querySelector('p.text-xs');
     const statusSpan = div.querySelector('span.rounded');
     const meta = metaEl?.textContent || '';
     const parts = meta.split('•').map(s => s.trim());
@@ -932,12 +974,14 @@ function obterDadosFormNovoPDI() {
     const [dataInicio, dataFim] = datasPart.split(' a ').map(s => s?.trim() || '—');
     const statusTxt = (statusSpan?.textContent || '').toLowerCase();
     const status = statusTxt.includes('andamento') ? 'em_andamento' : statusTxt.includes('conclu') ? 'concluido' : 'nao_iniciado';
+    const trilha = div.dataset?.trilha || '';
     acoes.push({
       texto: textoEl?.textContent?.trim() || '',
       metodologia,
       dataInicio: dataInicio || '—',
       dataFim: dataFim || '—',
-      status
+      status,
+      trilha
     });
   });
   const qtdConcluidas = acoes.filter(a => a.status === 'concluido').length;
@@ -1202,8 +1246,8 @@ function obterDadosFormNovoPDISupervisor() {
   const comportamento = comportamentoSelect?.options[comportamentoSelect?.selectedIndex]?.text || '';
   const acoes = [];
   document.querySelectorAll('#novo-pdi-supervisor-valores-lista .bloco-acoes-lista > div').forEach(div => {
-    const textoEl = div.querySelector('p.text-sm');
-    const metaEl = div.querySelector('p.text-xs');
+    const textoEl = div.querySelector('p.text-sm.font-medium') || div.querySelector('p.text-sm');
+    const metaEl = div.querySelector('p.text-xs.text-gray-400') || div.querySelector('p.text-xs');
     const statusSpan = div.querySelector('span.rounded');
     const meta = metaEl?.textContent || '';
     const parts = meta.split('•').map(s => s.trim());
@@ -1212,7 +1256,8 @@ function obterDadosFormNovoPDISupervisor() {
     const [dataInicio, dataFim] = (datasPart || '').split(' a ').map(s => s?.trim() || '—');
     const statusTxt = (statusSpan?.textContent || '').toLowerCase();
     const status = statusTxt.includes('andamento') ? 'em_andamento' : statusTxt.includes('conclu') ? 'concluido' : 'nao_iniciado';
-    acoes.push({ texto: textoEl?.textContent?.trim() || '', metodologia, dataInicio: dataInicio || '—', dataFim: dataFim || '—', status });
+    const trilha = div.dataset?.trilha || '';
+    acoes.push({ texto: textoEl?.textContent?.trim() || '', metodologia, dataInicio: dataInicio || '—', dataFim: dataFim || '—', status, trilha });
   });
   const blocos = [];
   document.querySelectorAll('#novo-pdi-supervisor-valores-lista .p-4').forEach(blocoDiv => {
@@ -1220,14 +1265,15 @@ function obterDadosFormNovoPDISupervisor() {
     const cs = blocoDiv.querySelector('.comportamento-select');
     const acoesBloco = [];
     blocoDiv.querySelectorAll('.bloco-acoes-lista > div').forEach(div => {
-      const textoEl = div.querySelector('p.text-sm');
-      const metaEl = div.querySelector('p.text-xs');
+      const textoEl = div.querySelector('p.text-sm.font-medium') || div.querySelector('p.text-sm');
+      const metaEl = div.querySelector('p.text-xs.text-gray-400') || div.querySelector('p.text-xs');
       const statusSpan = div.querySelector('span.rounded');
       const meta = metaEl?.textContent || '';
       const parts = meta.split('•').map(s => s.trim());
       const statusTxt = (statusSpan?.textContent || '').toLowerCase();
       const status = statusTxt.includes('andamento') ? 'em_andamento' : statusTxt.includes('conclu') ? 'concluido' : 'nao_iniciado';
-      acoesBloco.push({ texto: textoEl?.textContent?.trim() || '', metodologia: parts[0] || '', dataInicio: (parts[1] || '').split(' a ')[0]?.trim() || '—', dataFim: (parts[1] || '').split(' a ')[1]?.trim() || '—', status });
+      const trilha = div.dataset?.trilha || '';
+      acoesBloco.push({ texto: textoEl?.textContent?.trim() || '', metodologia: parts[0] || '', dataInicio: (parts[1] || '').split(' a ')[0]?.trim() || '—', dataFim: (parts[1] || '').split(' a ')[1]?.trim() || '—', status, trilha });
     });
     blocos.push({ valor: vs?.value || '', comportamento: cs?.options[cs?.selectedIndex]?.text || '', acoes: acoesBloco });
   });
@@ -1338,6 +1384,8 @@ document.getElementById('btn-novo-pdi-sup-enviar')?.addEventListener('click', en
 // ========== ADMIN: Valor > Comportamentos > Ações ==========
 let currentAdminValorNome = null;
 let currentAdminComportamentoIdx = null;
+let currentAdminComportamentoEditIdx = null; // ao editar comportamento
+let currentAdminAcaoEditIdx = null;          // ao editar ação
 
 function renderizarAdminValores(valorManterExpandido) {
   const container = document.getElementById('admin-valores-lista');
@@ -1380,8 +1428,8 @@ function renderizarAdminValores(valorManterExpandido) {
       compDiv.dataset.comportamentoIdx = String(idx);
       compDiv.innerHTML = `
         <div class="flex items-center justify-between mb-6">
-          <p class="font-medium text-sm">${(nome || '').replace(/</g, '&lt;')}</p>
-          <button class="btn-remover-comportamento text-red-400 hover:text-red-300 text-xs" data-valor="${(valorNome || '').replace(/"/g, '&quot;')}" data-idx="${idx}">Excluir</button>
+          <p class="font-medium text-sm admin-comportamento-nome cursor-pointer hover:text-primary transition flex-1" data-valor="${(valorNome || '').replace(/"/g, '&quot;')}" data-idx="${idx}">${(nome || '').replace(/</g, '&lt;')}</p>
+          <button class="btn-remover-comportamento text-red-400 hover:text-red-300 text-xs shrink-0" data-valor="${(valorNome || '').replace(/"/g, '&quot;')}" data-idx="${idx}">Excluir</button>
         </div>
         <h5 class="text-xs text-gray-400 mb-2">Ações</h5>
         <div class="admin-acoes-lista space-y-2 mb-3"></div>
@@ -1392,11 +1440,14 @@ function renderizarAdminValores(valorManterExpandido) {
       `;
       const acoesLista = compDiv.querySelector('.admin-acoes-lista');
       acoes.forEach((acao, ai) => {
+        const acaoTexto = typeof acao === 'string' ? acao : (acao?.texto || acao);
+        const vinculaTrilha = typeof acao === 'object' && acao?.vinculaTrilha;
+        const trilhaInfo = vinculaTrilha ? ' <span class="text-primary text-xs">• Trilha</span>' : '';
         const acaoDiv = document.createElement('div');
         acaoDiv.className = 'flex items-center justify-between p-2 bg-dark-card rounded border border-gray-700';
         acaoDiv.innerHTML = `
-          <p class="text-sm">${(acao || '').replace(/</g, '&lt;')}</p>
-          <button class="btn-remover-acao-admin text-red-400 hover:text-red-300 text-xs" data-valor="${(valorNome || '').replace(/"/g, '&quot;')}" data-comp-idx="${idx}" data-acao-idx="${ai}">Excluir</button>
+          <p class="text-sm admin-acao-texto cursor-pointer hover:text-primary transition flex-1" data-valor="${(valorNome || '').replace(/"/g, '&quot;')}" data-comp-idx="${idx}" data-acao-idx="${ai}">${(acaoTexto || '').replace(/</g, '&lt;')}${trilhaInfo}</p>
+          <button class="btn-remover-acao-admin text-red-400 hover:text-red-300 text-xs shrink-0" data-valor="${(valorNome || '').replace(/"/g, '&quot;')}" data-comp-idx="${idx}" data-acao-idx="${ai}">Excluir</button>
         `;
         acoesLista.appendChild(acaoDiv);
       });
@@ -1463,25 +1514,45 @@ document.getElementById('modal-novo-valor')?.addEventListener('click', (e) => {
   if (e.target === e.currentTarget) closeNovoValorModal();
 });
 
-// ========== MODAL: NOVO COMPORTAMENTO (Admin) ==========
-function openNovoComportamentoModal(valorNome) {
+// ========== MODAL: NOVO/EDITAR COMPORTAMENTO (Admin) ==========
+function openNovoComportamentoModal(valorNome, compIdx) {
   currentAdminValorNome = valorNome;
+  currentAdminComportamentoEditIdx = compIdx ?? null;
+  const isEdit = compIdx != null;
+  document.getElementById('modal-novo-comportamento-titulo').textContent = isEdit ? 'Editar Comportamento' : 'Novo Comportamento';
+  document.getElementById('modal-novo-comportamento-btn').textContent = isEdit ? 'Salvar' : 'Adicionar';
   document.getElementById('modal-novo-comportamento').classList.remove('hidden');
   document.getElementById('modal-novo-comportamento').classList.add('flex');
-  document.getElementById('novo-comportamento-nome').value = '';
+  const input = document.getElementById('novo-comportamento-nome');
+  if (isEdit && VALORES_DATA[valorNome]?.[compIdx]) {
+    const comp = VALORES_DATA[valorNome][compIdx];
+    input.value = typeof comp === 'string' ? comp : (comp.nome || '');
+  } else {
+    input.value = '';
+  }
 }
 
 function closeNovoComportamentoModal() {
   document.getElementById('modal-novo-comportamento').classList.add('hidden');
   document.getElementById('modal-novo-comportamento').classList.remove('flex');
   currentAdminValorNome = null;
+  currentAdminComportamentoEditIdx = null;
 }
 
 function saveNovoComportamento() {
   const nome = document.getElementById('novo-comportamento-nome').value.trim();
   if (!nome || !currentAdminValorNome) return;
   if (!VALORES_DATA[currentAdminValorNome]) VALORES_DATA[currentAdminValorNome] = [];
-  VALORES_DATA[currentAdminValorNome].push({ nome, acoes: [] });
+  if (currentAdminComportamentoEditIdx != null) {
+    const comp = VALORES_DATA[currentAdminValorNome][currentAdminComportamentoEditIdx];
+    if (typeof comp === 'object' && comp) {
+      comp.nome = nome;
+    } else {
+      VALORES_DATA[currentAdminValorNome][currentAdminComportamentoEditIdx] = { nome, acoes: [] };
+    }
+  } else {
+    VALORES_DATA[currentAdminValorNome].push({ nome, acoes: [] });
+  }
   salvarValoresNoStorage();
   renderizarAdminValores(currentAdminValorNome);
   closeNovoComportamentoModal();
@@ -1491,13 +1562,32 @@ document.getElementById('modal-novo-comportamento')?.addEventListener('click', (
   if (e.target === e.currentTarget) closeNovoComportamentoModal();
 });
 
-// ========== MODAL: NOVA AÇÃO (Admin) ==========
-function openNovaAcaoAdminModal(valorNome, comportamentoIdx) {
+// ========== MODAL: NOVA/EDITAR AÇÃO (Admin) ==========
+function openNovaAcaoAdminModal(valorNome, comportamentoIdx, acaoIdx) {
   currentAdminValorNome = valorNome;
   currentAdminComportamentoIdx = comportamentoIdx;
+  currentAdminAcaoEditIdx = acaoIdx ?? null;
+  const isEdit = acaoIdx != null;
+  document.getElementById('modal-nova-acao-admin-titulo-h3').textContent = isEdit ? 'Editar Ação' : 'Nova Ação';
+  document.getElementById('modal-nova-acao-admin-btn').textContent = isEdit ? 'Salvar' : 'Adicionar';
   document.getElementById('modal-nova-acao-admin').classList.remove('hidden');
   document.getElementById('modal-nova-acao-admin').classList.add('flex');
-  document.getElementById('nova-acao-admin-titulo').value = '';
+  const inputTitulo = document.getElementById('nova-acao-admin-titulo');
+  const inputTrilha = document.getElementById('nova-acao-admin-vincula-trilha');
+  if (isEdit) {
+    const comp = VALORES_DATA[valorNome]?.[comportamentoIdx];
+    const acao = comp?.acoes?.[acaoIdx];
+    if (acao) {
+      inputTitulo.value = typeof acao === 'string' ? acao : (acao.texto || '');
+      inputTrilha.checked = typeof acao === 'object' && acao?.vinculaTrilha;
+    } else {
+      inputTitulo.value = '';
+      inputTrilha.checked = false;
+    }
+  } else {
+    inputTitulo.value = '';
+    inputTrilha.checked = false;
+  }
 }
 
 function closeNovaAcaoAdminModal() {
@@ -1505,6 +1595,7 @@ function closeNovaAcaoAdminModal() {
   document.getElementById('modal-nova-acao-admin').classList.remove('flex');
   currentAdminValorNome = null;
   currentAdminComportamentoIdx = null;
+  currentAdminAcaoEditIdx = null;
 }
 
 function saveNovaAcaoAdmin() {
@@ -1513,7 +1604,12 @@ function saveNovaAcaoAdmin() {
   const comp = VALORES_DATA[currentAdminValorNome]?.[currentAdminComportamentoIdx];
   if (!comp || typeof comp === 'string') return;
   if (!comp.acoes) comp.acoes = [];
-  comp.acoes.push(titulo);
+  const vinculaTrilha = document.getElementById('nova-acao-admin-vincula-trilha')?.checked || false;
+  if (currentAdminAcaoEditIdx != null) {
+    comp.acoes[currentAdminAcaoEditIdx] = { texto: titulo, vinculaTrilha };
+  } else {
+    comp.acoes.push({ texto: titulo, vinculaTrilha });
+  }
   salvarValoresNoStorage();
   renderizarAdminValores(currentAdminValorNome);
   closeNovaAcaoAdminModal();
@@ -1528,8 +1624,12 @@ document.addEventListener('click', (e) => {
   if (!document.getElementById('view-admin')?.contains(e.target)) return;
   const btn = e.target.closest('.btn-add-comportamento');
   if (btn) { e.preventDefault(); openNovoComportamentoModal(btn.dataset.valor || ''); return; }
+  const compNome = e.target.closest('.admin-comportamento-nome');
+  if (compNome) { e.preventDefault(); openNovoComportamentoModal(compNome.dataset.valor || '', parseInt(compNome.dataset.idx || '0', 10)); return; }
   const btnAcao = e.target.closest('.btn-add-acao-admin');
   if (btnAcao) { e.preventDefault(); openNovaAcaoAdminModal(btnAcao.dataset.valor || '', parseInt(btnAcao.dataset.compIdx || '0', 10)); return; }
+  const acaoTexto = e.target.closest('.admin-acao-texto');
+  if (acaoTexto) { e.preventDefault(); openNovaAcaoAdminModal(acaoTexto.dataset.valor || '', parseInt(acaoTexto.dataset.compIdx || '0', 10), parseInt(acaoTexto.dataset.acaoIdx || '0', 10)); return; }
   const btnRemComp = e.target.closest('.btn-remover-comportamento');
   if (btnRemComp) { e.preventDefault(); removerComportamentoAdmin(btnRemComp.dataset.valor || '', parseInt(btnRemComp.dataset.idx || '0', 10)); return; }
   const btnRemAcao = e.target.closest('.btn-remover-acao-admin');
