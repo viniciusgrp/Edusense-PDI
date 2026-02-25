@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDI - Plano de Desenvolvimento Individual | edusense</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#00BCD4',
+            'dark-bg': '#1A1D20',
+            'dark-card': '#25282D',
+            'dark-sidebar': '#1E2125',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .tab-active { border-bottom: 2px solid #00BCD4; color: #00BCD4; }
+    .sidebar-item-active { background: rgba(0,188,212,0.15); color: #00BCD4; border-left: 3px solid #00BCD4; }
+    .modal-backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
+    .toggle-dot { transition: transform 0.2s; }
+    .toggle-on .toggle-dot { transform: translateX(20px); }
+    .toggle-on { background-color: #00BCD4 !important; }
+  </style>
+</head>
+<body class="bg-dark-bg text-gray-100 min-h-screen">
+  <div class="flex">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-dark-sidebar min-h-screen flex flex-col">
+      <div class="p-4 border-b border-gray-700">
+        <span class="text-xl font-semibold">edusense<span class="text-primary">.</span></span>
+      </div>
+      <nav class="flex-1 p-2 mt-4">
+        <a href="#" class="sidebar-item flex items-center gap-3 px-3 py-2 rounded text-gray-400 hover:text-white hover:bg-gray-700/50 mb-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          Página Inicial
+        </a>
+        <a href="#" class="sidebar-item flex items-center gap-3 px-3 py-2 rounded text-gray-400 hover:text-white hover:bg-gray-700/50 mb-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          Aprendizagem
+        </a>
+        <a href="#" class="sidebar-item flex items-center gap-3 px-3 py-2 rounded text-gray-400 hover:text-white hover:bg-gray-700/50 mb-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+          Social
+        </a>
+        <a href="#" class="sidebar-item flex items-center gap-3 px-3 py-2 rounded text-gray-400 hover:text-white hover:bg-gray-700/50 mb-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+          Conquistas
+        </a>
+        <a href="#" class="sidebar-item flex items-center gap-3 px-3 py-2 rounded text-gray-400 hover:text-white hover:bg-gray-700/50 mb-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          Wiki
+        </a>
+        <a href="#" class="sidebar-item flex items-center gap-3 px-3 py-2 rounded text-gray-400 hover:text-white hover:bg-gray-700/50 mb-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          Central de vagas
+        </a>
+        <a href="#" class="sidebar-item sidebar-item-active flex items-center gap-3 px-3 py-2 rounded mb-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+          PDI
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col min-h-screen">
+      <!-- Header -->
+      <header class="bg-dark-card border-b border-gray-700 px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-4 flex-1 max-w-xl">
+          <input type="text" placeholder="Buscar..." class="bg-dark-bg border border-gray-600 rounded-lg px-4 py-2 w-full text-sm focus:outline-none focus:border-primary">
+          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </div>
+        <div class="flex items-center gap-4">
+          <svg class="w-5 h-5 text-gray-400 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          <svg class="w-5 h-5 text-gray-400 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          <svg class="w-5 h-5 text-gray-400 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <span id="header-usuario-nome" class="text-sm text-gray-400">Olá, Vinicius Pacheco</span>
+          <div id="header-usuario-avatar" class="w-8 h-8 rounded-full bg-primary/30 flex items-center justify-center text-primary font-semibold">V</div>
+        </div>
+      </header>
+
+      <!-- Tabs de Visão -->
+      <div class="border-b border-gray-700 px-6">
+        <div class="flex gap-8">
+          <button data-view="aluno" class="view-tab tab-active py-4 font-medium text-sm">Visão do Aluno</button>
+          <button data-view="supervisor" class="view-tab py-4 font-medium text-sm text-gray-400 hover:text-gray-200">Visão do Supervisor</button>
+          <button data-view="admin" class="view-tab py-4 font-medium text-sm text-gray-400 hover:text-gray-200">Visão do Administrador</button>
+        </div>
+      </div>
+
+      <!-- Content Areas -->
+      <div class="flex-1 p-6 overflow-auto">
+        
+        <!-- VISÃO DO ALUNO -->
+        <div id="view-aluno" class="view-content">
+          <button onclick="openNovoPDIModal()" class="mb-6 px-4 py-2 bg-primary hover:bg-primary/90 rounded-lg text-white font-medium text-sm flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Novo PDI
+          </button>
+
+          <!-- Lista de PDIs -->
+          <div id="pdi-lista-aluno" class="space-y-4">
+            <div data-pdi-id="pdi-1" class="bg-dark-card rounded-lg p-6 border border-gray-700 flex items-start justify-between gap-4">
+              <div class="flex items-start gap-4">
+                <img src="https://api.dicebear.com/7.x/avataaars/png?seed=person&size=96" alt="Avatar" class="w-12 h-12 rounded-full object-cover shrink-0">
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <p class="font-medium">Assumir cargo de Coordenação de Marketing</p>
+                    <span class="px-2 py-0.5 rounded text-xs font-medium bg-primary/20 text-primary border border-primary/40">Em andamento</span>
+                  </div>
+                  <p class="text-sm text-gray-400 mt-1">Tipo: Próximo cargo</p>
+                  <p class="text-sm text-gray-400">Valor: Liderança • Comportamento: Comunicar-se de forma clara e objetiva</p>
+                  <div class="mt-3 flex items-center gap-4">
+                    <div class="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden max-w-xs">
+                      <div class="h-full bg-primary rounded-full" style="width: 50%"></div>
+                    </div>
+                    <span class="text-sm text-primary font-medium">50%</span>
+                  </div>
+                </div>
+              </div>
+              <button onclick="openDetalhesPDIModal('em_andamento', 'pdi-1')" class="px-4 py-2 bg-primary hover:bg-primary/90 rounded-lg text-white text-sm font-medium flex items-center gap-2 shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Ver detalhes
+              </button>
+            </div>
+            <div data-pdi-id="pdi-2" class="bg-dark-card rounded-lg p-6 border border-gray-700 flex items-start justify-between gap-4">
+              <div class="flex items-start gap-4">
+                <img src="https://api.dicebear.com/7.x/avataaars/png?seed=person&size=96" alt="Avatar" class="w-12 h-12 rounded-full object-cover shrink-0">
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <p class="font-medium">Aprimorar habilidades em desenvolvimento front-end</p>
+                    <span class="px-2 py-0.5 rounded text-xs font-medium bg-amber-500/20 text-amber-400 border border-amber-500/40">Rascunho</span>
+                  </div>
+                  <p class="text-sm text-gray-400 mt-1">Tipo: Desenvolvimento transversal</p>
+                  <p class="text-sm text-gray-400">Valor: Gestão de Projetos • Comportamento: Planejar e executar projetos</p>
+                  <div class="mt-3 flex items-center gap-4">
+                    <div class="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden max-w-xs">
+                      <div class="h-full bg-gray-500 rounded-full" style="width: 0%"></div>
+                    </div>
+                    <span class="text-sm text-gray-400 font-medium">0%</span>
+                  </div>
+                </div>
+              </div>
+              <button onclick="openDetalhesPDIModal('rascunho', 'pdi-2')" class="px-4 py-2 bg-primary hover:bg-primary/90 rounded-lg text-white text-sm font-medium flex items-center gap-2 shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Ver detalhes
+              </button>
+            </div>
+            <div data-pdi-id="pdi-3" class="bg-dark-card rounded-lg p-6 border border-gray-700 flex items-start justify-between gap-4">
+              <div class="flex items-start gap-4">
+                <img src="https://api.dicebear.com/7.x/avataaars/png?seed=person&size=96" alt="Avatar" class="w-12 h-12 rounded-full object-cover shrink-0">
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <p class="font-medium">Concluir certificação PMP</p>
+                    <span class="px-2 py-0.5 rounded text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/40">Concluído</span>
+                  </div>
+                  <p class="text-sm text-gray-400 mt-1">Tipo: Próximo cargo</p>
+                  <p class="text-sm text-gray-400">Valor: Gestão de Projetos • Comportamento: Gerenciar stakeholders</p>
+                  <div class="mt-3 flex items-center gap-4">
+                    <div class="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden max-w-xs">
+                      <div class="h-full bg-green-500 rounded-full" style="width: 100%"></div>
+                    </div>
+                    <span class="text-sm text-green-400 font-medium">100%</span>
+                  </div>
+                </div>
+              </div>
+              <button onclick="openDetalhesPDIModal('concluido', 'pdi-3')" class="px-4 py-2 bg-primary hover:bg-primary/90 rounded-lg text-white text-sm font-medium flex items-center gap-2 shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Ver detalhes
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- VISÃO DO SUPERVISOR -->
+        <div id="view-supervisor" class="view-content hidden">
+          <div class="flex gap-4 mb-6">
+            <button class="tab-sub px-4 py-2 rounded-lg bg-dark-card text-gray-400 hover:text-white text-sm">Meus PDIs</button>
+            <button class="tab-sub px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium">Meu Time</button>
+          </div>
+          <h2 class="text-xl font-semibold mb-6">Meu Time</h2>
+          <button onclick="openNovoPDISupervisorModal()" class="mb-6 px-4 py-2 bg-primary hover:bg-primary/90 rounded-lg text-white font-medium text-sm flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            Novo PDI para colaborador
+          </button>
+
+          <!-- PDIs em rascunho (criados pelo supervisor) -->
+          <div id="supervisor-rascunhos-wrapper" class="mb-6 hidden">
+            <h3 class="text-lg font-medium mb-3">PDIs em rascunho</h3>
+            <div id="supervisor-rascunhos-lista" class="space-y-4">
+              <!-- Cards de rascunho adicionados dinamicamente -->
+            </div>
+          </div>
+          
+          <div class="space-y-4" id="supervisor-time-lista">
+            <div data-pdi-id="pdi-1" class="bg-dark-card rounded-lg p-6 border border-gray-700 flex items-start justify-between gap-4">
+              <div class="flex items-start gap-4">
+                <img src="https://api.dicebear.com/7.x/avataaars/png?seed=person&size=96" alt="Avatar" class="w-12 h-12 rounded-full object-cover shrink-0">
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <p class="font-medium">Assumir cargo de Coordenação de Marketing</p>
+                    <span class="supervisor-card-status px-2 py-0.5 rounded text-xs font-medium bg-primary/20 text-primary border border-primary/40">Em andamento</span>
+                  </div>
+                  <p class="text-sm text-primary font-medium mt-1">Julia Duarte</p>
+                  <p class="text-sm text-gray-400 mt-1">Tipo: Próximo cargo</p>
+                  <p class="text-sm text-gray-400">Valor: Liderança • Comportamento: Comunicar-se de forma clara e objetiva</p>
+                  <div class="mt-3 flex items-center gap-4">
+                    <div class="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden max-w-xs">
+                      <div class="h-full bg-primary rounded-full supervisor-card-barra" style="width: 50%"></div>
+                    </div>
+                    <span class="supervisor-card-progress text-sm text-primary font-medium">50%</span>
+                  </div>
+                </div>
+              </div>
+              <button class="px-4 py-2 bg-primary hover:bg-primary/90 rounded-lg text-white text-sm font-medium flex items-center gap-2 shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Ver detalhes
+              </button>
+            </div>
+            <div data-pdi-id="pdi-2" class="bg-dark-card rounded-lg p-6 border border-gray-700 flex items-start justify-between gap-4">
+              <div class="flex items-start gap-4">
+                <img src="https://api.dicebear.com/7.x/avataaars/png?seed=person&size=96" alt="Avatar" class="w-12 h-12 rounded-full object-cover shrink-0">
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <p class="font-medium">Aprimorar habilidades em desenvolvimento front-end</p>
+                    <span class="supervisor-card-status px-2 py-0.5 rounded text-xs font-medium bg-amber-500/20 text-amber-400 border border-amber-500/40">Rascunho</span>
+                  </div>
+                  <p class="text-sm text-primary font-medium mt-1">Roberto Carlos</p>
+                  <p class="text-sm text-gray-400 mt-1">Tipo: Desenvolvimento transversal</p>
+                  <p class="text-sm text-gray-400">Valor: Gestão de Projetos • Comportamento: Planejar e executar projetos</p>
+                  <div class="mt-3 flex items-center gap-4">
+                    <div class="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden max-w-xs">
+                      <div class="h-full bg-gray-500 rounded-full supervisor-card-barra" style="width: 0%"></div>
+                    </div>
+                    <span class="supervisor-card-progress text-sm text-gray-400 font-medium">0%</span>
+                  </div>
+                </div>
+              </div>
+              <button class="px-4 py-2 bg-primary hover:bg-primary/90 rounded-lg text-white text-sm font-medium flex items-center gap-2 shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Ver detalhes
+              </button>
+            </div>
+            <div data-pdi-id="pdi-3" class="bg-dark-card rounded-lg p-6 border border-gray-700 flex items-start justify-between gap-4">
+              <div class="flex items-start gap-4">
+                <img src="https://api.dicebear.com/7.x/avataaars/png?seed=person&size=96" alt="Avatar" class="w-12 h-12 rounded-full object-cover shrink-0">
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <p class="font-medium">Concluir certificação PMP</p>
+                    <span class="supervisor-card-status px-2 py-0.5 rounded text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/40">Concluído</span>
+                  </div>
+                  <p class="text-sm text-primary font-medium mt-1">Isis Azevedo</p>
+                  <p class="text-sm text-gray-400 mt-1">Tipo: Próximo cargo</p>
+                  <p class="text-sm text-gray-400">Valor: Gestão de Projetos • Comportamento: Gerenciar stakeholders</p>
+                  <div class="mt-3 flex items-center gap-4">
+                    <div class="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden max-w-xs">
+                      <div class="h-full bg-green-500 rounded-full supervisor-card-barra" style="width: 100%"></div>
+                    </div>
+                    <span class="supervisor-card-progress text-sm text-green-400 font-medium">100%</span>
+                  </div>
+                </div>
+              </div>
+              <button class="px-4 py-2 bg-primary hover:bg-primary/90 rounded-lg text-white text-sm font-medium flex items-center gap-2 shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Ver detalhes
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- VISÃO DO ADMINISTRADOR -->
+        <div id="view-admin" class="view-content hidden">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-semibold">Configuração de Habilidades (Valores)</h2>
+            <button onclick="openNovoValorModal()" class="px-4 py-2 bg-primary hover:bg-primary/90 rounded-lg text-white font-medium text-sm flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              Novo Valor
+            </button>
+          </div>
+
+          <!-- Lista de Valores (Valor > Comportamentos > Ações) -->
+          <div id="admin-valores-lista" class="space-y-4 mb-8">
+            <!-- Conteúdo renderizado via renderizarAdminValores() -->
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal: Detalhes do PDI -->
+  <div id="modal-detalhes-pdi" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop p-4 overflow-y-auto">
+    <div class="bg-dark-card rounded-xl max-w-2xl w-full my-8 border border-gray-700 shadow-2xl" onclick="event.stopPropagation()">
+      <div class="p-6 border-b border-gray-700 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <h3 class="text-lg font-semibold">Detalhes do PDI</h3>
+          <span id="pdi-modal-status" class="px-2 py-0.5 rounded text-xs font-medium bg-primary/20 text-primary border border-primary/40">Em andamento</span>
+        </div>
+        <button onclick="closeDetalhesPDIModal()" class="p-2 hover:bg-gray-700 rounded-lg transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="p-6 space-y-6 max-h-[calc(90vh-120px)] overflow-y-auto">
+        <!-- Perfil e botões -->
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex items-start gap-4">
+            <div id="pdi-modal-aluno-avatar" class="w-14 h-14 rounded-full bg-primary/30 flex items-center justify-center text-primary font-bold text-xl">J</div>
+            <div>
+              <p id="pdi-modal-aluno-nome" class="font-semibold text-lg">Julia Duarte</p>
+              <p id="pdi-modal-aluno-cargo" class="text-sm text-gray-400">Analista de Marketing</p>
+              <div class="flex items-center gap-3 mt-2 text-sm text-gray-400">
+                <span id="pdi-modal-supervisor-info" class="flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg> Vinicius Pacheco • Supervisor</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex gap-2 shrink-0">
+            <button type="button" id="btn-salvar-rascunho-detalhes" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm">Salvar Rascunho</button>
+            <button type="button" id="btn-enviar-supervisor-detalhes" class="px-4 py-2 bg-primary hover:bg-primary/90 rounded-lg text-white text-sm">Enviar ao Supervisor</button>
+          </div>
+        </div>
+
+        <!-- Contexto Inicial -->
+        <div id="pdi-modal-contexto-wrapper">
+          <h4 class="text-primary font-medium mb-2">Contexto Inicial (Feedback do Supervisor)</h4>
+          <div class="bg-dark-bg/50 rounded-lg p-4 border border-gray-700">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary text-sm font-bold">V</div>
+              <div>
+                <p id="pdi-modal-contexto-autor" class="font-medium text-sm">Vinicius Pacheco</p>
+                <p class="text-xs text-gray-400">Hoje às 09:00</p>
+              </div>
+            </div>
+            <p id="pdi-modal-contexto" class="text-sm text-gray-300"></p>
+          </div>
+        </div>
+
+        <!-- Objetivo do PDI -->
+        <div>
+          <h4 class="text-primary font-medium mb-2">Objetivo do PDI</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Objetivo</label>
+              <textarea id="pdi-modal-objetivo" rows="2" class="w-full bg-dark-bg border border-gray-600 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary" readonly></textarea>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Tipo de Objetivo</label>
+              <input type="text" id="pdi-modal-tipo" class="w-full bg-dark-bg border border-gray-600 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary" readonly>
+            </div>
+          </div>
+        </div>
+
+        <!-- Valor e Comportamento (modo leitura - em andamento/concluído) -->
+        <div id="pdi-modal-valor-comportamento-wrapper" class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-primary text-sm font-medium mb-2">Valor (Competência)</label>
+            <input type="text" id="pdi-modal-valor" class="w-full bg-dark-bg border border-gray-600 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary" readonly>
+          </div>
+          <div>
+            <label class="block text-primary text-sm font-medium mb-2">Comportamento</label>
+            <input type="text" id="pdi-modal-comportamento" class="w-full bg-dark-bg border border-gray-600 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary" readonly>
+          </div>
+        </div>
+
+        <!-- Blocos Valor/Comportamento/Ações (modo edição - rascunho) -->
+        <div id="pdi-modal-blocos-wrapper" class="hidden">
+          <h4 class="text-primary font-medium mb-2 flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Valores, Comportamentos e Ações
+          </h4>
+          <div id="pdi-modal-blocos-lista" class="space-y-4 mb-3">
+            <!-- Blocos preenchidos dinamicamente -->
+          </div>
+          <button onclick="adicionarBlocoDetalhesPDI()" class="px-4 py-2 bg-primary/20 text-primary hover:bg-primary/30 rounded-lg text-sm font-medium flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Adicionar Valor e Comportamento
+          </button>
+        </div>
+
+        <!-- Ações de Desenvolvimento (modo leitura - em andamento/concluído) -->
+        <div id="pdi-modal-acoes-wrapper">
+          <h4 class="text-primary font-medium mb-2 flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Ações vinculadas ao valor e comportamento
+          </h4>
+          <div id="pdi-modal-acoes" class="space-y-3">
+            <!-- Preenchido dinamicamente -->
+          </div>
+          <button id="pdi-modal-salvar-status-btn" onclick="salvarStatusAcoesPDI()" class="mt-3 px-4 py-2 bg-primary hover:bg-primary/90 rounded-lg text-white text-sm font-medium hidden">
+            Salvar modificações
+          </button>
+        </div>
+
+        <!-- Comentários -->
+        <div>
+          <h4 class="text-primary font-medium mb-2">Comentários</h4>
+          <div id="pdi-comentarios-lista" class="space-y-4 mb-4">
+            <!-- Comentários preenchidos dinamicamente conforme o PDI -->
+          </div>
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary text-sm font-bold shrink-0">V</div>
+            <div class="flex-1">
+              <p id="pdi-comentario-autor-label" class="text-sm font-medium mb-2">Vinicius Pacheco</p>
+              <textarea id="pdi-comentario-input" rows="2" placeholder="Escreva um comentário..." class="w-full bg-dark-bg border border-gray-600 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary"></textarea>
+              <button onclick="adicionarComentarioPDI()" class="mt-2 px-4 py-2 bg-primary hover:bg-primary/90 rounded-lg text-white text-sm">Adicionar Comentário</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Nova Ação do PDI -->
+  <div id="modal-acao" class="fixed inset-0 z-[60] hidden items-center justify-center modal-backdrop p-4">
+    <div class="bg-dark-card rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-gray-700 shadow-2xl" onclick="event.stopPropagation()">
+      <div class="p-6 border-b border-gray-700 flex items-center justify-between">
+        <h3 class="text-lg font-semibold" id="modal-acao-titulo">Nova Ação do PDI – Liderança</h3>
+        <button onclick="closeActionModal()" class="p-2 hover:bg-gray-700 rounded-lg transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div>
+          <label class="block text-primary text-sm font-medium mb-2">Metodologia</label>
+          <select id="acao-metodologia" class="w-full bg-dark-bg border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary">
+            <option value="70">70 – Experiência Prática</option>
+            <option value="20">20 – Aprendizado Social</option>
+            <option value="10">10 – Aprendizado Formal</option>
+          </select>
+        </div>
+        
+        <div>
+          <label class="block text-primary text-sm font-medium mb-2">Ação</label>
+          <select id="acao-tipo" class="w-full bg-dark-bg border border-primary rounded-lg px-4 py-2 focus:outline-none focus:border-primary">
+            <option value="">Selecione uma ação sugerida...</option>
+            <option value="liderar_projeto">Liderar um projeto multidisciplinar</option>
+            <option value="reunioes">Conduzir reuniões semanais com a equipe</option>
+            <option value="mentoria">Participar de mentoria</option>
+            <option value="curso">Iniciar curso da biblioteca</option>
+            <option value="outro">Outro (ação personalizada)</option>
+          </select>
+          <div id="acao-outro-container" class="mt-2 hidden">
+            <textarea id="acao-outro" rows="3" placeholder="Descreva sua ação personalizada..." class="w-full bg-dark-bg border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary"></textarea>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-primary text-sm font-medium mb-2 flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              Data de Início
+            </label>
+            <input type="date" id="acao-data-inicio" placeholder="Selecionar" class="w-full bg-dark-bg border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary">
+          </div>
+          <div>
+            <label class="block text-primary text-sm font-medium mb-2 flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              Data de Término
+            </label>
+            <input type="date" id="acao-data-fim" placeholder="Selecionar" class="w-full bg-dark-bg border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary">
+          </div>
+        </div>
+        
+        <div>
+          <label class="block text-primary text-sm font-medium mb-2">Status da Ação</label>
+          <select id="acao-status" class="w-full bg-dark-bg border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary">
+            <option value="nao_iniciado">Não Iniciado</option>
+            <option value="em_andamento">Em Andamento</option>
+            <option value="concluido">Concluído</option>
+          </select>
+        </div>
+      </div>
+      <div class="p-6 border-t border-gray-700 flex justify-end gap-2">
+        <button onclick="closeActionModal()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm">Cancelar</button>
+        <button onclick="saveAction()" class="px-4 py-2 bg-primary hover:bg-primary/90 rounded-lg text-white text-sm">Salvar Ação</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Novo PDI (Visão do Aluno) -->
+  <div id="modal-novo-pdi" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop p-4 overflow-y-auto">
+    <div class="bg-dark-card rounded-xl max-w-2xl w-full my-8 border border-gray-700 shadow-2xl" onclick="event.stopPropagation()">
+      <div class="p-6 border-b border-gray-700 flex items-center justify-between">
+        <h3 class="text-lg font-semibold">Novo PDI</h3>
+        <button onclick="closeNovoPDIModal()" class="p-2 hover:bg-gray-700 rounded-lg transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="p-6 space-y-6 max-h-[calc(90vh-140px)] overflow-y-auto">
+        <!-- Objetivo do PDI -->
+        <div>
+          <h4 class="text-primary font-medium mb-2">Objetivo do PDI</h4>
+          <textarea id="novo-pdi-objetivo" rows="3" placeholder="Descreva seu objetivo de desenvolvimento..." class="w-full bg-dark-bg border border-gray-600 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary"></textarea>
+        </div>
+        <!-- Tipo de Objetivo -->
+        <div>
+          <label class="block text-primary text-sm font-medium mb-2">Tipo de Objetivo</label>
+          <select id="novo-pdi-tipo" class="w-full bg-dark-bg border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary">
+            <option value="">Selecione...</option>
+            <option value="performance">Performance atual</option>
+            <option value="proximo_cargo">Próximo cargo</option>
+            <option value="transversal">Desenvolvimento transversal</option>
+          </select>
+        </div>
+        <!-- Valor, Comportamento e Ações (cada bloco tem suas ações vinculadas) -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="text-primary font-medium">Valor, Comportamento e Ações</h4>
+            <button onclick="adicionarValorComportamento()" class="px-3 py-1.5 bg-primary/20 text-primary hover:bg-primary/30 rounded-lg text-sm font-medium flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              Adicionar
+            </button>
+          </div>
+          <p class="text-sm text-gray-400 mb-3">Cada valor e comportamento pode ter múltiplas ações vinculadas.</p>
+          <div id="novo-pdi-valores-lista" class="space-y-4">
+            <!-- Blocos adicionados dinamicamente: Valor + Comportamento + Ações -->
+          </div>
+        </div>
+      </div>
+      <div class="p-6 border-t border-gray-700 flex justify-end gap-2">
+        <button type="button" id="btn-novo-pdi-cancelar" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm">Cancelar</button>
+        <button type="button" id="btn-novo-pdi-salvar-rascunho" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm">Salvar Rascunho</button>
+        <button type="button" id="btn-novo-pdi-enviar" class="px-4 py-2 bg-primary hover:bg-primary/90 rounded-lg text-white text-sm">Enviar ao Supervisor</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Novo PDI para Supervisor (mesmo modelo do Aluno + select colaborador + contexto) -->
+  <div id="modal-novo-pdi-supervisor" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop p-4 overflow-y-auto">
+    <div class="bg-dark-card rounded-xl max-w-2xl w-full my-8 border border-gray-700 shadow-2xl" onclick="event.stopPropagation()">
+      <div class="p-6 border-b border-gray-700 flex items-center justify-between">
+        <h3 class="text-lg font-semibold">Novo PDI para colaborador</h3>
+        <button onclick="closeNovoPDISupervisorModal()" class="p-2 hover:bg-gray-700 rounded-lg transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="p-6 space-y-6 max-h-[calc(90vh-140px)] overflow-y-auto">
+        <!-- Colaborador -->
+        <div>
+          <label class="block text-primary text-sm font-medium mb-2">Colaborador</label>
+          <select id="novo-pdi-supervisor-colaborador" class="w-full bg-dark-bg border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary">
+            <option value="">Selecione o colaborador...</option>
+            <option value="julia">Julia Duarte</option>
+            <option value="roberto">Roberto Carlos</option>
+            <option value="isis">Isis Azevedo</option>
+          </select>
+        </div>
+        <!-- Contexto inicial -->
+        <div>
+          <label class="block text-primary text-sm font-medium mb-2">Contexto inicial</label>
+          <textarea id="novo-pdi-supervisor-contexto" rows="3" placeholder="Direcionamentos e expectativas do supervisor..." class="w-full bg-dark-bg border border-gray-600 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary"></textarea>
+        </div>
+        <!-- Objetivo do PDI -->
+        <div>
+          <h4 class="text-primary font-medium mb-2">Objetivo do PDI</h4>
+          <textarea id="novo-pdi-supervisor-objetivo" rows="3" placeholder="Descreva o objetivo de desenvolvimento..." class="w-full bg-dark-bg border border-gray-600 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary"></textarea>
+        </div>
+        <!-- Tipo de Objetivo -->
+        <div>
+          <label class="block text-primary text-sm font-medium mb-2">Tipo de Objetivo</label>
+          <select id="novo-pdi-supervisor-tipo" class="w-full bg-dark-bg border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary">
+            <option value="">Selecione...</option>
+            <option value="performance">Performance atual</option>
+            <option value="proximo_cargo">Próximo cargo</option>
+            <option value="transversal">Desenvolvimento transversal</option>
+          </select>
+        </div>
+        <!-- Valor, Comportamento e Ações -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="text-primary font-medium">Valor, Comportamento e Ações</h4>
+            <button onclick="adicionarValorComportamentoSupervisor()" class="px-3 py-1.5 bg-primary/20 text-primary hover:bg-primary/30 rounded-lg text-sm font-medium flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              Adicionar
+            </button>
+          </div>
+          <p class="text-sm text-gray-400 mb-3">Cada valor e comportamento pode ter múltiplas ações vinculadas.</p>
+          <div id="novo-pdi-supervisor-valores-lista" class="space-y-4">
+            <!-- Blocos adicionados dinamicamente -->
+          </div>
+        </div>
+      </div>
+      <div class="p-6 border-t border-gray-700 flex justify-end gap-2">
+        <button type="button" id="btn-novo-pdi-sup-cancelar" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm">Cancelar</button>
+        <button type="button" id="btn-novo-pdi-sup-salvar-rascunho" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm">Salvar Rascunho</button>
+        <button type="button" id="btn-novo-pdi-sup-enviar" class="px-4 py-2 bg-primary hover:bg-primary/90 rounded-lg text-white text-sm">Enviar ao aluno</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Novo Valor (Admin) -->
+  <div id="modal-novo-valor" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop p-4">
+    <div class="bg-dark-card rounded-xl max-w-md w-full border border-gray-700 shadow-2xl" onclick="event.stopPropagation()">
+      <div class="p-6 border-b border-gray-700 flex items-center justify-between">
+        <h3 class="text-lg font-semibold flex items-center gap-2">
+          <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+          Novo Valor (Competência/Habilidade)
+        </h3>
+        <button onclick="closeNovoValorModal()" class="p-2 hover:bg-gray-700 rounded-lg transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div>
+          <label class="block text-primary text-sm font-medium mb-2">Nome do Valor</label>
+          <input type="text" id="novo-valor-nome" placeholder="Ex: Liderança, Comunicação..." class="w-full bg-dark-bg border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary">
+        </div>
+      </div>
+      <div class="p-6 border-t border-gray-700 flex justify-end gap-2">
+        <button onclick="closeNovoValorModal()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm">Cancelar</button>
+        <button onclick="saveNovoValor()" class="px-4 py-2 bg-primary hover:bg-primary/90 rounded-lg text-white text-sm">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Novo Comportamento (Admin) -->
+  <div id="modal-novo-comportamento" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop p-4">
+    <div class="bg-dark-card rounded-xl max-w-md w-full border border-gray-700 shadow-2xl" onclick="event.stopPropagation()">
+      <div class="p-6 border-b border-gray-700 flex items-center justify-between">
+        <h3 class="text-lg font-semibold">Novo Comportamento</h3>
+        <button onclick="closeNovoComportamentoModal()" class="p-2 hover:bg-gray-700 rounded-lg transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div>
+          <label class="block text-primary text-sm font-medium mb-2">Nome do Comportamento</label>
+          <input type="text" id="novo-comportamento-nome" placeholder="Ex: Comunicar-se de forma clara e objetiva" class="w-full bg-dark-bg border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary">
+        </div>
+      </div>
+      <div class="p-6 border-t border-gray-700 flex justify-end gap-2">
+        <button onclick="closeNovoComportamentoModal()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm">Cancelar</button>
+        <button onclick="saveNovoComportamento()" class="px-4 py-2 bg-primary hover:bg-primary/90 rounded-lg text-white text-sm">Adicionar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Nova Ação (Admin - dentro do Comportamento) -->
+  <div id="modal-nova-acao-admin" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop p-4">
+    <div class="bg-dark-card rounded-xl max-w-md w-full border border-gray-700 shadow-2xl" onclick="event.stopPropagation()">
+      <div class="p-6 border-b border-gray-700 flex items-center justify-between">
+        <h3 class="text-lg font-semibold">Nova Ação</h3>
+        <button onclick="closeNovaAcaoAdminModal()" class="p-2 hover:bg-gray-700 rounded-lg transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div>
+          <label class="block text-primary text-sm font-medium mb-2">Descrição da ação</label>
+          <input type="text" id="nova-acao-admin-titulo" placeholder="Ex: Conduzir reuniões semanais com a equipe" class="w-full bg-dark-bg border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-primary">
+        </div>
+      </div>
+      <div class="p-6 border-t border-gray-700 flex justify-end gap-2">
+        <button onclick="closeNovaAcaoAdminModal()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm">Cancelar</button>
+        <button onclick="saveNovaAcaoAdmin()" class="px-4 py-2 bg-primary hover:bg-primary/90 rounded-lg text-white text-sm">Adicionar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
