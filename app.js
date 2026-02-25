@@ -24,6 +24,21 @@ function normalizarBlocosPDI(dados) {
   return [{ valor: dados.valor || '', comportamento: dados.comportamento || '', acoes: dados.acoes || [] }];
 }
 
+// Retorna array de ações do PDI (de acoes ou de blocos) para cálculo de progresso
+function getAcoesPDI(dados) {
+  if (dados.acoes && Array.isArray(dados.acoes) && dados.acoes.length > 0) return dados.acoes;
+  const blocos = normalizarBlocosPDI(dados);
+  return blocos.flatMap(b => b.acoes || []);
+}
+
+// Calcula progresso baseado no status das ações (concluído = 100%, demais = 0)
+function calcularProgressoPDI(dados) {
+  const acoes = getAcoesPDI(dados);
+  if (acoes.length === 0) return 0;
+  const concluidas = acoes.filter(a => a.status === 'concluido').length;
+  return Math.round((concluidas / acoes.length) * 100);
+}
+
 // Store de dados dos PDIs (objetivo, tipo, valor, comportamento, acoes, status, blocos, etc.)
 const STORAGE_KEY_VALORES = 'pdi_valores_data';
 const STORAGE_KEY_PDI = 'pdi_store';
@@ -164,8 +179,7 @@ function atualizarStatusCardsSupervisor() {
       textos[0].textContent = `Tipo: ${dados.tipoLabel || '—'}`;
       textos[1].textContent = `Valor: ${dados.valor || '—'} • Comportamento: ${dados.comportamento || '—'}`;
     }
-    const acoes = dados.acoes || [];
-    const progresso = acoes.length > 0 ? Math.round((acoes.filter(a => a.status === 'concluido').length / acoes.length) * 100) : 0;
+    const progresso = calcularProgressoPDI(dados);
     const barClass = dados.status === 'concluido' ? 'bg-green-500' : dados.status === 'em_andamento' ? 'bg-primary' : 'bg-gray-500';
     const progressClass = dados.status === 'concluido' ? 'text-green-400' : dados.status === 'em_andamento' ? 'text-primary' : 'text-gray-400';
     const barra = card.querySelector('.supervisor-card-barra');
@@ -188,8 +202,7 @@ function renderizarRascunhosSupervisor() {
   const rascunhos = Object.entries(pdiStore).filter(([, d]) => d.status === 'rascunho' && d.criadoPorSupervisor);
   lista.innerHTML = '';
   rascunhos.forEach(([id, d]) => {
-    const acoes = d.acoes || [];
-    const progresso = acoes.length > 0 ? Math.round((acoes.filter(a => a.status === 'concluido').length / acoes.length) * 100) : 0;
+    const progresso = calcularProgressoPDI(d);
     const card = criarCardRascunhoSupervisor({ ...d, id, progresso });
     lista.appendChild(card);
   });
@@ -233,8 +246,7 @@ function renderizarListaPDIAluno() {
   if (!lista) return;
   lista.innerHTML = '';
   Object.entries(pdiStore).forEach(([id, dados]) => {
-    const acoes = dados.acoes || [];
-    const progresso = acoes.length > 0 ? Math.round((acoes.filter(a => a.status === 'concluido').length / acoes.length) * 100) : 0;
+    const progresso = calcularProgressoPDI(dados);
     const card = criarCardPDI({ ...dados, id, status: dados.status || 'rascunho', progresso });
     lista.appendChild(card);
   });
@@ -244,8 +256,7 @@ function renderizarListaPDISupervisor() {
   if (!lista) return;
   lista.innerHTML = '';
   Object.entries(pdiStore).forEach(([id, dados]) => {
-    const acoes = dados.acoes || [];
-    const progresso = acoes.length > 0 ? Math.round((acoes.filter(a => a.status === 'concluido').length / acoes.length) * 100) : 0;
+    const progresso = calcularProgressoPDI(dados);
     const s = STATUS_LABELS[dados.status] || STATUS_LABELS.rascunho;
     const barClass = dados.status === 'concluido' ? 'bg-green-500' : dados.status === 'em_andamento' ? 'bg-primary' : 'bg-gray-500';
     const progressClass = dados.status === 'concluido' ? 'text-green-400' : dados.status === 'em_andamento' ? 'text-primary' : 'text-gray-400';
@@ -547,10 +558,12 @@ function openDetalhesPDIModal(status, pdiId, opts) {
     if (btnSalvarStatus) btnSalvarStatus.classList.toggle('hidden', acoesFlat.length === 0 || !podeEditarStatusAcoes);
   }
 
-  // Mostrar/ocultar botões (Salvar Rascunho e Enviar só para rascunho e quando pode modificar)
+  // Mostrar/ocultar botões (Excluir, Salvar Rascunho e Enviar só para rascunho e quando pode modificar)
+  const btnExcluir = document.getElementById('btn-excluir-pdi');
   const btnEnviar = document.getElementById('btn-enviar-supervisor-detalhes');
   const btnRascunho = document.getElementById('btn-salvar-rascunho-detalhes');
   const mostrarBtnsRascunho = statusAtual === 'rascunho' && isRascunho;
+  if (btnExcluir) btnExcluir.style.display = mostrarBtnsRascunho ? '' : 'none';
   if (btnEnviar) btnEnviar.style.display = mostrarBtnsRascunho ? '' : 'none';
   if (btnRascunho) btnRascunho.style.display = mostrarBtnsRascunho ? '' : 'none';
 
@@ -733,21 +746,22 @@ function salvarStatusAcoesPDI() {
     }
   });
 
-  if (!alterado) return;
   salvarPDINoStorage();
 
-  // Recalcular progresso
+  // Recalcular progresso e verificar se todas ações concluídas -> marcar PDI como Concluído
   const total = acoes.length;
   const concluidas = acoes.filter(a => a.status === 'concluido').length;
   const progresso = total > 0 ? Math.round((concluidas / total) * 100) : 0;
 
-  // Atualizar card na lista
-  document.querySelectorAll(`[data-pdi-id="${pdiId}"]`).forEach(card => {
-    const barra = card.querySelector('.overflow-hidden .h-full.rounded-full');
-    const progressSpan = card.querySelector('.mt-3.flex.items-center.gap-4 span') || card.querySelector('.flex.items-center.gap-2.mb-2 span');
-    if (barra) barra.style.width = progresso + '%';
-    if (progressSpan) progressSpan.textContent = progresso + '%';
-  });
+  if (total > 0 && concluidas === total) {
+    pdiStore[pdiId].status = 'concluido';
+    salvarPDINoStorage();
+  }
+
+  // Re-renderizar listas para refletir progresso e status
+  renderizarListaPDIAluno();
+  renderizarListaPDISupervisor();
+  atualizarStatusCardsSupervisor();
 
   closeDetalhesPDIModal();
 }
@@ -790,6 +804,7 @@ document.getElementById('modal-detalhes-pdi')?.addEventListener('click', (e) => 
 });
 
 // Event listeners para botões do modal Detalhes do PDI
+document.getElementById('btn-excluir-pdi')?.addEventListener('click', excluirPDI);
 document.getElementById('btn-salvar-rascunho-detalhes')?.addEventListener('click', salvarDetalhesPDIRascunho);
 document.getElementById('btn-enviar-supervisor-detalhes')?.addEventListener('click', enviarDetalhesPDISupervisor);
 
@@ -980,6 +995,24 @@ function enviarNovoPDIAluno() {
   closeNovoPDIModal();
 }
 
+function excluirPDI() {
+  const pdiId = currentDetalhesPdiId;
+  if (!pdiId || !pdiStore[pdiId]) { closeDetalhesPDIModal(); return; }
+  const dados = pdiStore[pdiId];
+  if (dados.status !== 'rascunho') return;
+  if (!confirm('Tem certeza que deseja excluir este PDI? Esta ação não pode ser desfeita.')) return;
+  delete pdiStore[pdiId];
+  salvarPDINoStorage();
+  document.querySelectorAll(`[data-pdi-id="${pdiId}"]`).forEach(el => el.remove());
+  const wrapperRascunhos = document.getElementById('supervisor-rascunhos-wrapper');
+  const listaRascunhos = document.getElementById('supervisor-rascunhos-lista');
+  if (wrapperRascunhos && listaRascunhos && listaRascunhos.children.length === 0) wrapperRascunhos.classList.add('hidden');
+  renderizarListaPDIAluno();
+  renderizarListaPDISupervisor();
+  renderizarRascunhosSupervisor();
+  closeDetalhesPDIModal();
+}
+
 function salvarDetalhesPDIRascunho() {
   const pdiId = currentDetalhesPdiId;
   if (!pdiId || !pdiStore[pdiId]) { closeDetalhesPDIModal(); return; }
@@ -996,10 +1029,14 @@ function salvarDetalhesPDIRascunho() {
   pdiStore[pdiId].valor = blocos[0]?.valor || '';
   pdiStore[pdiId].comportamento = blocos[0]?.comportamento || '';
   pdiStore[pdiId].acoes = acoesFlat;
-  salvarPDINoStorage();
 
   const concluidas = acoesFlat.filter(a => a.status === 'concluido').length;
   const progresso = acoesFlat.length > 0 ? Math.round((concluidas / acoesFlat.length) * 100) : 0;
+
+  if (acoesFlat.length > 0 && concluidas === acoesFlat.length) {
+    pdiStore[pdiId].status = 'concluido';
+  }
+  salvarPDINoStorage();
 
   document.querySelectorAll(`[data-pdi-id="${pdiId}"]`).forEach(card => {
     const titulo = card.querySelector('.flex.items-center.gap-2 p.font-medium');
@@ -1018,6 +1055,12 @@ function salvarDetalhesPDIRascunho() {
     if (barra) barra.style.width = progresso + '%';
     if (progressSpan) progressSpan.textContent = progresso + '%';
   });
+
+  if (pdiStore[pdiId].status === 'concluido') {
+    renderizarListaPDIAluno();
+    renderizarListaPDISupervisor();
+    renderizarRascunhosSupervisor();
+  }
 
   closeDetalhesPDIModal();
 }
